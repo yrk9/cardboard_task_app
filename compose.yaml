@@ -34,7 +34,7 @@ services:
       - db-data:/var/lib/mysql
 
   backend:
-    build: .
+    build: ./backend
     ports:
       - "8080:8080"
     environment:
@@ -48,6 +48,16 @@ services:
 
     depends_on:
       - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
 
 volumes:
   db-data: # 指定したボリュームをここで定義する
