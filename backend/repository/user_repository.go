@@ -24,7 +24,7 @@ func NewUserRepository(db *sql.DB) UserRepository {
 // ユーザアカウントの作成メソッド
 
 func (r userRepository) CreateUser(user *model.User) error {
-	_, err := r.db.Exec(
+	result, err := r.db.Exec(
 		`INSERT INTO users (email, password_hash, created_at, updated_at) VALUES (
 		user.Email, 
 		user.Password, 
@@ -34,9 +34,15 @@ func (r userRepository) CreateUser(user *model.User) error {
 	
 	if err != nil {
 		return err
-	} else {
-		return nil
 	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+
+	user.ID = id
+	return nil
 }
 
 // Emailからユーザを探すメソッド
