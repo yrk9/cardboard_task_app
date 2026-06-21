@@ -5,6 +5,7 @@ package repository
 import (
 	"database/sql"
 	"github.com/yrk9/cardboard_task_app/model"
+	"time"
 )
 
 type UserRepository interface {
@@ -25,12 +26,12 @@ func NewUserRepository(db *sql.DB) UserRepository {
 
 func (r userRepository) CreateUser(user *model.User) error {
 	result, err := r.db.Exec(
-		`INSERT INTO users (email, password_hash, created_at, updated_at) VALUES (
+		`INSERT INTO users (email, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?)`,
 		user.Email, 
-		user.Password, 
-		time.Now, 
-		time.Now,
-	)`)
+		user.PasswordHash, 
+		time.Now(), 
+		time.Now(),
+	)
 	
 	if err != nil {
 		return err

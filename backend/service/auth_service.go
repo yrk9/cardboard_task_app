@@ -81,7 +81,9 @@ func (a* authService) Register(email, password string) (string, error) {
 	//新規ユーザの作成
 	newUser.Email = email
 	newUser.PasswordHash = string(hashed)
-	a.userRepo.CreateUser(newUser)
+	if err := a.userRepo.CreateUser(newUser); err != nil {
+		return "", err
+	}
 	//JWTの生成
 	return generateJWT(newUser.ID)
 }
