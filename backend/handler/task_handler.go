@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"github.com/yrk9/cardboard_task_app/middleware"
 	"github.com/yrk9/cardboard_task_app/service"
+	"strconv"
+	"errors"
 )
 
 type TaskHandler struct {
@@ -37,7 +39,7 @@ func (h *TaskHandler) List(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "サーバーエラー", http.StatusInternalServerError)
 		return
 	}
-	w.Header().set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(taskList)
 
@@ -51,7 +53,7 @@ func (h *TaskHandler) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "認証が必要です", http.StatusUnauthorized)
 		return
 	}
-	taskList, err := h.taskService.List(userID)
+	// taskList, err := h.taskService.List(userID)
 
 	//ボディをデコード
 	var input service.TaskInput
@@ -62,7 +64,7 @@ func (h *TaskHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// service呼び出し
-	err := h.taskService.Create(userID, input)   // 今は error だけ返す形でしたね
+	err := h.taskService.Create(userID, input)   // 今は error だけ返す形
 	if err != nil {
 		switch {
 		case errors.Is(err, service.ErrTitleRequired),
@@ -105,7 +107,7 @@ func (h *TaskHandler) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 成功 → 200 + タスクをJSONで返す
-	w.Header().set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(task)
 }
@@ -124,9 +126,9 @@ func (h *TaskHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// リクエストボディを service.TaskInput にデコード NGなら400
-	var input taskService.TaskInput
+	var input service.TaskInput
 
-	err = json.NewDecoder(r.Body).Decode(&input)
+	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		http.Error(w, "リクエストを取得できませんでした", http.StatusBadRequest)
 		return
@@ -146,7 +148,7 @@ func (h *TaskHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 成功 → 200（更新後のタスクを返すならJSONエンコード）
-	w.Header().set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(task)
 }
@@ -165,7 +167,7 @@ func (h *TaskHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// taskService.Delete(userID, id) を呼ぶ
-	err = h.taskService.Delete(userID, id)
+	err := h.taskService.Delete(userID, id)
 	// エラー処理
 	//    - ErrTaskNotFound → 404
 	//    - その他 → 500
@@ -178,7 +180,7 @@ func (h *TaskHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 成功 → 204 No Content（ボディなし、WriteHeaderのみ）
-	w.Header().set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -209,7 +211,7 @@ func (h *TaskHandler) ToggleComplete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 成功 → 200 + 更新後のタスクをJSONで返す
-	w.Header().set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(task)
 }

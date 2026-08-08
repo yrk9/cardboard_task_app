@@ -26,7 +26,7 @@ type TaskService interface {
 	Get(userID int64, taskID int64) (*model.Task, error)
 	Create(userID int64, input TaskInput) error
 	Delete(userID int64, taskID int64) error
-	Update(userID int64, input TaskInput) error
+	Update(userID int64, taskID int64, input TaskInput) (*model.Task, error)
 	ToggleComplete(userID int64, taskID int64) (*model.Task, error)
 }
 
@@ -94,27 +94,35 @@ func (t* taskService) Delete(userID int64, taskID int64) error {
 	return nil
 }
 
-func (t* taskService) Update(userID int64, input TaskInput) error {
-	//バリデーション
+func (t* taskService) Update(userID int64, taskID int64, input TaskInput) (*model.Task, error) {
+	// ① まず既存タスクを取得（自分のタスクか確認も兼ねる）
+	task, err := t.taskRepo.FindByID(taskID, userID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, ErrTaskNotFound
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	// ② バリデーション
 	if input.Title == "" {
-		return ErrTitleRequired
+		return nil, ErrTitleRequired
 	}
 	if input.Priority != "high" && input.Priority != "mid" && input.Priority != "low" {
-		return ErrInvalidPriority
+		return nil, ErrInvalidPriority
 	}
 
-	task := &model.Task{
-		UserID: userID,
-		Title: input.Title,
-		Description: input.Description,
-		Priority: input.Priority,
-		DueDate: input.DueDate,
-	}
+	// ③ 値を書き換える
+	task.Title = input.Title
+	task.Description = input.Description
+	task.Priority = input.Priority
+	task.DueDate = input.DueDate
 
+	// ④ 保存
 	if err := t.taskRepo.Update(task); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return task, nil   // ← すでに手元にある task をそのまま返せる
 }
 
 func (t* taskService) ToggleComplete(userID int64, taskID int64) (*model.Task, error) {
