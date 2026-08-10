@@ -133,15 +133,16 @@ func (t* taskService) ToggleComplete(userID int64, taskID int64) (*model.Task, e
 		return nil, err
 	}
 
-	if task.CompletedAt == nil {
-		task = &model.Task{
-			CompletedAt: nil,
-		}
+	if task.CompletedAt != nil {
+		task.CompletedAt = nil
 	} else {
 		now := time.Now()
-		task = &model.Task{
-			CompletedAt: &now,
-		}
+		task.CompletedAt = &now
 	}
+
+	if err := t.taskRepo.Update(task); err != nil {   
+		return nil, err
+	}
+	
 	return task, nil
 }
