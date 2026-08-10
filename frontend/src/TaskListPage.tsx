@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "./context/AuthContext";
-import { createTask, getTaskList } from "./api/tasks";
+import { createTask, deleteTask, getTaskList } from "./api/tasks";
 import { useNavigate } from "react-router-dom";
 import { Task } from "./types";
 
@@ -12,16 +12,17 @@ export function TaskListPage() {
   //   const [isLoadingTasks, setIsLoadingTask] = useState<boolean>(false);
   const [form, setForm] = useState({
     title: "",
-    descriptions: "",
+    description: "",
     priority: "mid",
     due_date: "",
   });
 
+  async function fetchTasks() {
+    const data = await getTaskList();
+    setTasks(data ?? []);
+  }
+
   useEffect(() => {
-    async function fetchTasks() {
-      const data = await getTaskList();
-      setTasks(data);
-    }
     //ローディングでない状態でトークンがない場合(ログインできてないので弾く)
     if (!isLoading && !token) {
       navigate("/login");
@@ -34,6 +35,7 @@ export function TaskListPage() {
   ) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    console.log(form);
   }
 
   async function handleAddTask(e: React.FormEvent<HTMLFormElement>) {
@@ -41,11 +43,24 @@ export function TaskListPage() {
     setErrorMessage(null);
 
     try {
-      await createTask({ ...form, due_date: form.due_date || null });
-      const data = await getTaskList();
-      setTasks(data);
+      await createTask({
+        ...form,
+        due_date: form.due_date ? `${form.due_date}T00:00:00Z` : null,
+      });
+      await fetchTasks();
     } catch (error) {
       setErrorMessage("タスクを追加できませんでした");
+    }
+  }
+
+  async function handleDeleteTask(id: number) {
+    setErrorMessage(null);
+
+    try {
+      await deleteTask(id);
+      await fetchTasks();
+    } catch (error) {
+      setErrorMessage("タスクを削除できませんでした");
     }
   }
 
@@ -64,8 +79,8 @@ export function TaskListPage() {
         <label>
           内容
           <input
-            name="descriptions"
-            value={form.descriptions}
+            name="description"
+            value={form.description}
             onChange={handleChange}
           ></input>
         </label>
@@ -91,11 +106,15 @@ export function TaskListPage() {
         {errorMessage && <p>{errorMessage}</p>}
       </form>
       <div>
-        {tasks.map((task: Task) => (
-          <li key={task.id}>
-            {task.title},{task.descriptions}, {task.priority}, {task.due_date}
-          </li>
-        ))}
+        {tasks != null &&
+          tasks.map((task: Task) => (
+            <li key={task.id}>
+              {task.title},{task.description}, {task.priority}, {task.due_date}
+              <button onClick={() => handleDeleteTask(task.id)}>
+                タスクの削除
+              </button>
+            </li>
+          ))}
       </div>
     </div>
   );

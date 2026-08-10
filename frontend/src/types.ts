@@ -1,7 +1,7 @@
 export type Task = {
   id: number;
   title: string;
-  descriptions: string;
+  description: string;
   priority: "high" | "mid" | "low";
   due_date: string | null;
   completed_at: string | null;
