@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "./context/AuthContext";
-import { createTask, deleteTask, getTaskList } from "./api/tasks";
+import {
+  createTask,
+  deleteTask,
+  getTaskList,
+  patchTaskComplete,
+} from "./api/tasks";
 import { useNavigate } from "react-router-dom";
 import { Task } from "./types";
 
@@ -64,6 +69,17 @@ export function TaskListPage() {
     }
   }
 
+  async function handleCompleteTask(id: number) {
+    setErrorMessage(null);
+
+    try {
+      await patchTaskComplete(id);
+      await fetchTasks();
+    } catch (error) {
+      setErrorMessage("タスクを完了できませんでした");
+    }
+  }
+
   return (
     <div>
       <h1>ダン部屋</h1>
@@ -109,10 +125,12 @@ export function TaskListPage() {
         {tasks != null &&
           tasks.map((task: Task) => (
             <li key={task.id}>
-              {task.title},{task.description}, {task.priority}, {task.due_date}
+              {task.title},{task.description}, {task.priority}, {task.due_date},{" "}
+              {task.completed_at != null ? task.completed_at : "未完了"}
               <button onClick={() => handleDeleteTask(task.id)}>
                 タスクの削除
               </button>
+              <button onClick={() => handleCompleteTask(task.id)}>完了</button>
             </li>
           ))}
       </div>
