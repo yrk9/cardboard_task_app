@@ -15,10 +15,10 @@ var (
 )
 
 type TaskInput struct {
-	Title string
-	Description string
-	Priority string
-	DueDate *time.Time
+	Title string `json:"title"`
+	Description string `json:"description"`
+	Priority string `json:"priority"`
+	DueDate *time.Time `json:"due_date"`
 }
 
 type TaskService interface {

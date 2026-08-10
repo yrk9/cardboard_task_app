@@ -6,7 +6,7 @@ type Task struct {
 	ID int64 `json:"id"`
 	UserID int64 `json:"-"`
 	Title string `json:"title"`
-	Description string `json:"descriptions"`
+	Description string `json:"description"`
 	Priority string `json:"priority"`
 	DueDate *time.Time `json:"due_date"`
 	CompletedAt *time.Time `json:"completed_at"`
