@@ -9,7 +9,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Task } from "./types";
 
-export function TaskListPage() {
+interface Props {
+  handleTransfer: (transfar: string) => void;
+}
+
+export function TaskListPage({ handleTransfer }: Props) {
   const { token, isLoading } = useAuth();
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -134,6 +138,9 @@ export function TaskListPage() {
             </li>
           ))}
       </div>
+
+      <button onClick={() => handleTransfer("login")}>戻る</button>
+      <button onClick={() => handleTransfer("view")}>タスクビュー</button>
     </div>
   );
 }

@@ -5,6 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { Task } from "./types";
 import "./RoomPage.css";
 
+interface Props {
+  handleTransfer: (transfar: string) => void;
+}
+
 function getRoomStage(count: number): { emoji: string; message: string } {
   if (count === 0) return { emoji: "✨", message: "最高の状態です！" };
   if (count <= 3) return { emoji: "📦", message: "まだ余裕あり" };
@@ -23,7 +27,7 @@ function getBoxClassName(task: Task): string {
   return `box ${sizeClass}`.trim();
 }
 
-export function RoomPage() {
+export function RoomPage({ handleTransfer }: Props) {
   const { token, isLoading } = useAuth();
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -60,6 +64,10 @@ export function RoomPage() {
 
       <p>{stage.message}</p>
       <p>未完了タスク:{incompleteCount}件</p>
+      <button onClick={() => handleTransfer("task")}>タスク一覧へ</button>
+      <button onClick={() => handleTransfer("login")}>
+        ログイン画面に戻る
+      </button>
     </div>
   );
 }
