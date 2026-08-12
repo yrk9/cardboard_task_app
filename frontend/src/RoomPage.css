@@ -1,0 +1,73 @@
+.room {
+  min-height: 400px;
+  background: linear-gradient(
+    to bottom,
+    #f5f0e6 0%,
+    #f5f0e6 85%,
+    #d9c9a3 85%,
+    #d9c9a3 100%
+  );
+  display: flex;
+  flex-wrap: wrap;
+  padding: 24px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  align-content: flex-start;
+  gap: 12px;
+  position: relative;
+}
+
+.box {
+  background: linear-gradient(135deg, #c9975c, #a9754a);
+  padding: auto;
+  border: 2px solid #8b5e34;
+  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+  position: relative;
+}
+
+.box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 22%;
+  background: #e8dcc0;
+  opacity: 0.9;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.box::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.box-high {
+  width: 80px;
+  height: 80px;
+}
+.box-mid {
+  width: 56px;
+  height: 56px;
+}
+.box-low {
+  width: 36px;
+  height: 36px;
+}
+
+/* 期限切れ：くすんで傾いた見た目 */
+.box-overdue {
+  filter: saturate(0.5) brightness(0.85);
+  transform: rotate(-6deg);
+}
+.box-overdue::before {
+  background: #d8cba0;
+  transform: rotate(3deg) translateX(4px);
+}
