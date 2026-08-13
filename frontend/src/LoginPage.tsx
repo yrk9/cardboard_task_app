@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import { register } from "./api/auth";
+import "./LoginPage.css";
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -22,37 +23,54 @@ export function LoginPage() {
       }
       navigate("/");
     } catch (error) {
-      setErrorMessage("ログインに失敗しました");
+      if (mode === "login") {
+        setErrorMessage("ログインに失敗しました");
+      } else {
+        setErrorMessage("登録に失敗しました");
+      }
     }
   }
 
+  function handleRegester() {
+    if (mode === "login") {
+      setMode("register");
+    } else {
+      setMode("login");
+    }
+    setErrorMessage(null);
+  }
+
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <label>
+    <div className="login">
+      <h2>{mode === "login" ? "ログイン" : "登録"}</h2>
+      {errorMessage && <p>{errorMessage}</p>}
+      <form onSubmit={handleSubmit} className="form-group">
+        <label className="form-label">
           Eメール
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="form-control"
+            placeholder="your@email.com"
           ></input>
         </label>
-        <label>
+        <label className="form-label">
           パスワード
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className="form-control"
+            placeholder="パスワードを入力"
           ></input>
         </label>
 
-        <button type="submit">{mode === "login" ? "ログイン" : "登録"}</button>
-        <button
-          type="button"
-          onClick={() => setMode(mode === "login" ? "register" : "login")}
-        >
+        <button type="submit" className="btn-login">
+          {mode === "login" ? "ログイン" : "登録"}
+        </button>
+        <button type="button" onClick={handleRegester} className="btn-login">
           {mode === "login" ? "新規登録はこちら" : "ログインへ"}
         </button>
-        {errorMessage && <p>{errorMessage}</p>}
       </form>
     </div>
   );
